@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test name="Factorial Tests">
+        <classes>
+            <class name="FactorialCalculatorTest"/>
+        </classes>
+    </test>
+    <test name="Triangle Tests">
+        <classes>
+            <class name="TriangleAreaCalculatorTest"/>
+        </classes>
+    </test>
+    <test name="Arithmetic Tests">
+        <classes>
+            <class name="ArithmeticOperationsTest"/>
+        </classes>
+    </test>
+    <test name="Comparator Tests">
+        <classes>
+            <class name="NumberComparatorTest"/>
+        </classes>
+    </test>
+</suite>
