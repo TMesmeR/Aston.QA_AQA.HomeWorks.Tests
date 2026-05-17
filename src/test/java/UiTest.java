@@ -56,15 +56,14 @@ public class UiTest {
     @Test
     public void verifyPaymentFormAndContinueButton(){
         final By PHONE_NUMBER = By.xpath("//input[@placeholder='Номер телефона']");
-        final By SUM_PAYMANT = By.xpath("//*[@id=\"connection-sum\"]");
+        final By SUM_PAYMENT = By.xpath("//*[@id=\"connection-sum\"]");
         final By SENDER_BTN = By.xpath("//*[@id=\"pay-connection\"]/button");
         final String TEST_SUM = "10";
         final String TEST_PHONE = "297777777";
 
         driver.findElement(PHONE_NUMBER).sendKeys(TEST_PHONE);
-        driver.findElement(SUM_PAYMANT).sendKeys(TEST_SUM);
+        driver.findElement(SUM_PAYMENT).sendKeys(TEST_SUM);
         driver.findElement(SENDER_BTN).click();
-
         System.out.println("Значения приняты, кнопка нажата, дальше появляется модальное окно");
     }
 
