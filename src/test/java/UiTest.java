@@ -1,21 +1,11 @@
-import org.example.DriverManager;
-import org.example.service.MainPageService;
+
 import org.example.service.ModalPageService;
 import org.example.utils.Constants;
 import org.example.utils.LogoPayWrapper;
 import org.example.utils.LogoPayWrapperModalPage;
 import org.example.utils.ServicesPayment;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.time.Duration;
 import java.util.List;
 
 public class UiTest extends BaseTest {

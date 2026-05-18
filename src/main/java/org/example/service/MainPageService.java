@@ -33,11 +33,13 @@ public class MainPageService {
         return mainPage.clickLinkService();
     }
 
+    //не используется, просто для красоты
     public MainPageService setPhoneNumber(String phoneNumber) {
         mainPage.setPhoneNumber(phoneNumber);
         return this;
     }
 
+    //не используется, просто для красоты
     public MainPageService setSumPayment(String sumPayment) {
         mainPage.setSumPayment(sumPayment);
         return this;

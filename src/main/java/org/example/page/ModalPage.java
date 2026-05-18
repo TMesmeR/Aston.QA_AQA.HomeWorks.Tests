@@ -1,17 +1,12 @@
 package org.example.page;
 
-import org.example.utils.LogoPayWrapper;
 import org.example.utils.LogoPayWrapperModalPage;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
-
 import java.time.Duration;
-import java.util.List;
+
 
 public class ModalPage extends BasePage {
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
