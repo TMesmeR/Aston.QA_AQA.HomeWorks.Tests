@@ -1,4 +1,10 @@
 import org.example.DriverManager;
+import org.example.service.MainPageService;
+import org.example.service.ModalPageService;
+import org.example.utils.Constants;
+import org.example.utils.LogoPayWrapper;
+import org.example.utils.LogoPayWrapperModalPage;
+import org.example.utils.ServicesPayment;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,66 +16,84 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.List;
 
-public class UiTest {
-    final By COOKIE_BUTTON = By.xpath("//button[text() = 'Принять']");
-    protected WebDriver driver;
-    protected WebDriverWait wait;
+public class UiTest extends BaseTest {
 
-    @BeforeMethod
-    public void setDriver() {
-        driver = DriverManager.getDriver();
-        driver.get("https://www.mts.by/");
-        driver.findElement(COOKIE_BUTTON).click();
-    }
-
+    ModalPageService modalPageService;
     @Test
     public void checkOnlineRecharge(){
-        final By FIND_BLOCK_BY_TEXT = By.xpath("//h2[contains(text(),'Онлайн')]");
-        final String EXPECTED_TEXT = "Онлайн пополнение\nбез комиссии";
-        Assert.assertEquals(driver.findElement(FIND_BLOCK_BY_TEXT).getText(), EXPECTED_TEXT);
+        Assert.assertEquals(mainPageService.getHeaderPayWrapperText(), Constants.EXPECTED_TEX_MTS);
     }
 
     @Test
     public void verifyPaymentSystemLogos(){
-        final By LOGO_VISA = By.xpath("//img[@alt='VISA']");
-        final By LOGO_VERIFIED_BY_VISA = By.xpath("//img[@alt='Verified By Visa']");
-        final By LOGO_MASTERCARD = By.xpath("//img[@alt='MasterCard']");
-        final By LOGO_MASTERCARD_SECURE_CODE = By.xpath("//img[@alt='MasterCard Secure Code']");
-        final By LOGO_BELCARD = By.xpath("//img[@alt='Белкарт']");
-
-        Assert.assertTrue(driver.findElement(LOGO_VISA).isDisplayed(), "Не отображается лого Visa");
-        Assert.assertTrue(driver.findElement(LOGO_VERIFIED_BY_VISA).isDisplayed(), "Не отображается лого Verified By Visa");
-        Assert.assertTrue(driver.findElement(LOGO_MASTERCARD).isDisplayed(), "Не отображается лого MasterCard");
-        Assert.assertTrue(driver.findElement(LOGO_MASTERCARD_SECURE_CODE).isDisplayed(), "Не отображается лого MasterCard Secure Code");
-        Assert.assertTrue(driver.findElement(LOGO_BELCARD).isDisplayed(), "Не отображается лого Белкарт");
+        Assert.assertTrue(mainPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapper.Visa), "Не отображается лого Visa");
+        Assert.assertTrue(mainPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapper.VerifiedVisa), "Не отображается лого Verified By Visa");
+        Assert.assertTrue(mainPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapper.MasterCard), "Не отображается лого MasterCard");
+        Assert.assertTrue(mainPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapper.MastercardSecureCode), "Не отображается лого MasterCard Secure Code");
+        Assert.assertTrue(mainPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapper.Belcard), "Не отображается лого Белкарт");
     }
+
 
     @Test
     public void verifyServiceLink(){
-        final By LINK_SERVICE = By.xpath("//a[text()='Подробнее о сервисе']");
-        driver.findElement(LINK_SERVICE).click();
-        String currentUrl = driver.getCurrentUrl();
-        Assert.assertTrue(currentUrl.contains("poryadok-oplaty-i-bezopasnost-internet-platezhey"),"Нас кинуло куда-то не туда товарищ");
+        Assert.assertTrue(mainPageService.getUrlLinkService().contains("poryadok-oplaty-i-bezopasnost-internet-platezhey"),"Нас кинуло куда-то не туда товарищ");
     }
 
+
     @Test
-    public void verifyPaymentFormAndContinueButton(){
-        final By PHONE_NUMBER = By.xpath("//input[@placeholder='Номер телефона']");
-        final By SUM_PAYMANT = By.xpath("//*[@id=\"connection-sum\"]");
-        final By SENDER_BTN = By.xpath("//*[@id=\"pay-connection\"]/button");
+    public void verifyPaymentFormAndContinueWithModalPage() {
         final String TEST_SUM = "10";
         final String TEST_PHONE = "297777777";
 
-        driver.findElement(PHONE_NUMBER).sendKeys(TEST_PHONE);
-        driver.findElement(SUM_PAYMANT).sendKeys(TEST_SUM);
-        driver.findElement(SENDER_BTN).click();
+        modalPageService = mainPageService.setPhoneAndSumPayment(TEST_PHONE, TEST_SUM)
+                .openModalPage();
 
-        System.out.println("Значения приняты, кнопка нажата, дальше появляется модальное окно");
+        //Проверка корректности суммы (в тексте и на кнопке)
+        String amountText = modalPageService.getPaymentAmount();
+        String amountOnButton = modalPageService.getAmountOnButton();
+        Assert.assertTrue(amountText.contains(TEST_SUM), "Сумма в описании не совпадает");
+        Assert.assertTrue(amountOnButton.contains(TEST_SUM), "Сумма на кнопке не совпадает");
+        // Проверка номера телефона
+        String phoneFromModal = modalPageService.getPhoneNumber();
+        Assert.assertTrue(phoneFromModal.contains(TEST_PHONE), "Номер телефона не совпадает");
+        // Проверка надписей в незаполненных полях (лейблы)
+        Assert.assertTrue(modalPageService.areAllLabelsDisplayed(), "Не все лейблы полей отображаются");
+        // Проверка иконок платёжных систем
+        Assert.assertTrue(modalPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapperModalPage.VisaIcon), "Не отображается Виза");
+        Assert.assertTrue(modalPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapperModalPage.MasterIcon), "Не отображается Мастеркарт");
+        Assert.assertTrue(modalPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapperModalPage.BelkartIcon), "Не отображается Белкарт");
+        Assert.assertTrue(modalPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapperModalPage.MaestroIcon), "Не отображается Маэстро");
+        Assert.assertTrue(modalPageService.getLogoPayWrapperIsDisplayed(LogoPayWrapperModalPage.MirIcon), "Не отображается Мир");
+
+
     }
 
-   @AfterMethod
-    public void closeDriver() {
-        DriverManager.closeDriver();
+    @Test
+    public void placeholdersCommunicationServices(){
+       List<String> placeholders = mainPageService.getPlaceholders(ServicesPayment.communicationServices);
+       Assert.assertEquals(placeholders.get(0), "Номер телефона");
+       Assert.assertEquals(placeholders.get(1), "Сумма");
+    }
+
+    @Test
+    public void placeholdersHomeInternetServices(){
+        List<String> placeholders = mainPageService.getPlaceholders(ServicesPayment.homeInternetServices);
+        Assert.assertEquals(placeholders.get(0), "Номер абонента");
+        Assert.assertEquals(placeholders.get(1), "Сумма");
+    }
+    @Test
+    public void placeholdersInstallmentPlanServices(){
+        List<String> placeholders = mainPageService.getPlaceholders(ServicesPayment.installmentPlanServices);
+        Assert.assertEquals(placeholders.get(0), "Номер счета на 44");
+        Assert.assertEquals(placeholders.get(1), "Сумма");
+    }
+
+    @Test
+    public void placeholdersDebtServices(){
+        List<String> placeholders = mainPageService.getPlaceholders(ServicesPayment.debtServices);
+        Assert.assertEquals(placeholders.get(0), "Номер счета на 2073");
+        Assert.assertEquals(placeholders.get(1), "Сумма");
     }
 }
