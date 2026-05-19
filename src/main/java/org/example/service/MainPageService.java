@@ -1,5 +1,6 @@
 package org.example.service;
 
+import io.qameta.allure.Step;
 import org.example.page.MainPage;
 import org.example.page.RegistrationPage;
 import org.example.utils.Constants;
@@ -12,6 +13,7 @@ public class MainPageService {
         mainPage = new MainPage();
     }
 
+    @Step("Open page and accept cookie")
     public MainPageService openPageAdAcceptCookie(){
         mainPage
                 .openPage(MAIN_PAGE_URL)
@@ -19,6 +21,7 @@ public class MainPageService {
         return this;
     }
 
+    @Step("Click Button")
     public RegistrationPageServices clickButtonEnter(){
         mainPage.clickEnterButton();
         return new RegistrationPageServices();
